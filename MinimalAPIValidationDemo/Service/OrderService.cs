@@ -4,15 +4,16 @@ using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Text.Json;
 
-namespace MinimalAPIValidationDemo.Data;
+namespace MinimalAPIValidationDemo.Service;
 
 public class OrderService
 {
     private readonly List<Order> _orders = [];
-
+    private readonly string jsonordersDataPath = "Data/orders.json";
+    private readonly string toonordersDataPath = "Data/orders.toon";
     public OrderService()
     {
-        var mockData = File.ReadAllText("Data/orders.json");
+        var mockData = File.ReadAllText(jsonordersDataPath);
         _orders = JsonSerializer.Deserialize<List<Order>>(mockData, JsonSerializerOptions.Web) ?? [];
     }
 
@@ -37,6 +38,8 @@ public class OrderService
         if (!_orders.Contains(newOrder))
         {
             _orders.Add(newOrder);
+            string updatedJson = JsonSerializer.Serialize(_orders, UrlShortenerSettings.CachedJsonSerializerOptions);
+            File.WriteAllText(jsonordersDataPath, updatedJson);
         }
     }
 
@@ -44,12 +47,12 @@ public class OrderService
     {
         // Convert JSON to TOON
         // Your JSON string
-        string jsonData = File.ReadAllText("Data/orders.json");
+        string jsonData = File.ReadAllText(jsonordersDataPath);
         var converter = new JsonToToonConverter();
         string toonData = converter.Convert(jsonData);
         // Optionally, save TOON data to a file
-        if(File.Exists("Data/orders.toon")) File.Delete("Data/orders.toon");
-        File.WriteAllText("Data/orders.toon", toonData);
+        if(File.Exists(toonordersDataPath)) File.Delete(toonordersDataPath);
+        File.WriteAllText(toonordersDataPath, toonData);
         StringBuilder sb = new();
 
         // Count tokens saved

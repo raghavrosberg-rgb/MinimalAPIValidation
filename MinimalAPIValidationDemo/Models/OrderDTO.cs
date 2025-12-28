@@ -2,7 +2,7 @@
 
 namespace MinimalAPIValidationDemo.Models
 {
-    public class OrderDTO :IValidatableObject
+    public class OrderDTO : IValidatableObject
     {
         [Required]
         [Display(Name = "Customer Name")]
