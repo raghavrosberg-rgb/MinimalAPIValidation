@@ -4,10 +4,18 @@ using MinimalAPIValidationDemo.Models;
 using MinimalAPIValidationDemo.Service;
 using MinimalAPIValidationDemo.Utility;
 using Scalar.AspNetCore;
-
+using Spector;
+using Spector.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Spector services
+builder.Services.AddSpector();
+builder.Services.Configure<SpectorOptions>(options =>
+{
+    options.UiPath = "/spector";
+    options.InMemoryMaxTraces = 200;
+});
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<OrderService>();
 builder.Services.AddSingleton<ShortenedURLService>();
@@ -15,12 +23,14 @@ builder.Services.AddValidation();
 
 var app = builder.Build();
 
+// Use Spector middleware
+app.UseSpector();
 app.MapOpenApi();
-app.MapScalarApiReference("/", opt => 
-{ 
+app.MapScalarApiReference("/scalar", opt =>
+{
     opt.Title = "Minimal API Validation Demo";
     opt.Theme = ScalarTheme.Mars;
-} );
+});
 
 app.MapGet("/orders", (string? query, OrderService orderService) =>
 {
